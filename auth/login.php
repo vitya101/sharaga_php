@@ -1,6 +1,8 @@
 <?php 
     session_start();
-    require_once "./bd.php";
+    require_once "$_SERVER[DOCUMENT_ROOT]/bd.php";
+
+
 
     $login = $_POST["login"] ?? "";
     $pass = $_POST["pass"] ?? "";
@@ -8,14 +10,14 @@
 
     if ($login != "") {
         $conn = conn();
-        $user = $conn->prepare("SELECT password FROM users WHERE login=? LIMIT 1");
-        $user->execute([$login]);
-        $passDB = $user->fetchColumn();
-    
-        if ($passDB == "" || $pass != $passDB) {
+        $userDB = $conn->prepare("SELECT * FROM users WHERE login=? LIMIT 1");
+        $userDB->execute([$login]);
+        $user = $userDB->fetch();
+        $passDB = $user["password"];
+        if ($pass != $passDB) {
             $error = !$error;
         } else {
-            $_SESSION['login'] = $login;
+            $_SESSION['user'] = $user;
             header("Location: /");
         }
     }

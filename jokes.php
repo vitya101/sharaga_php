@@ -47,7 +47,7 @@
                     if ($countJoke > $limit) {
                         for($i = 0;$i < ceil($countJoke / $limit); $i++) {
                             $setOffset = $i * $limit;
-                            echo "<a href='$url?offset=$setOffset' class='border p-3 rounded w-10 h-10 flex items-center justify-center hover:bg-sky-400 hover:text-white'>". $i + 1 ."</a>";
+                            echo "<a href='$url?offset=$setOffset' class='border p-3 rounded w-10 h-10 flex items-center justify-center hover:bg-sky-400 hover:text-white'>" . ($i + 1) ."</a>";
                         }
                     }
                     // 
