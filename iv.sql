@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Сен 18 2024 г., 13:36
+-- Время создания: Окт 10 2024 г., 08:08
 -- Версия сервера: 8.0.30
 -- Версия PHP: 8.1.9
 
@@ -24,14 +24,34 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `bulletin_board`
+--
+
+CREATE TABLE `bulletin_board` (
+  `id` int NOT NULL,
+  `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `author_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Дамп данных таблицы `bulletin_board`
+--
+
+INSERT INTO `bulletin_board` (`id`, `title`, `description`, `author_id`) VALUES
+(1, 'sdf', 'sdfsdf', 1);
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `comments`
 --
 
 CREATE TABLE `comments` (
   `id` int NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `name` varchar(50) NOT NULL,
-  `comment` text NOT NULL
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `comment` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -52,8 +72,8 @@ INSERT INTO `comments` (`id`, `time`, `name`, `comment`) VALUES
 CREATE TABLE `jokes` (
   `id` int NOT NULL,
   `isHidden` tinyint(1) NOT NULL DEFAULT '1',
-  `joke` text NOT NULL,
-  `author` varchar(50) NOT NULL,
+  `joke` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `author` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `category_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -78,7 +98,7 @@ INSERT INTO `jokes` (`id`, `isHidden`, `joke`, `author`, `category_id`) VALUES
 
 CREATE TABLE `joke_categories` (
   `id` int NOT NULL,
-  `category` varchar(50) NOT NULL
+  `category` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -96,25 +116,46 @@ INSERT INTO `joke_categories` (`id`, `category`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `likes`
+--
+
+CREATE TABLE `likes` (
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `bulletin_id` int NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `users`
 --
 
 CREATE TABLE `users` (
   `id` int NOT NULL,
-  `login` varchar(50) NOT NULL,
-  `password` varchar(50) NOT NULL
+  `login` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'VISITOR'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Дамп данных таблицы `users`
 --
 
-INSERT INTO `users` (`id`, `login`, `password`) VALUES
-(1, '0_0', 'qwerty666');
+INSERT INTO `users` (`id`, `login`, `password`, `role`) VALUES
+(1, '0_0', 'qwerty666', 'ADMIN');
 
 --
 -- Индексы сохранённых таблиц
 --
+
+--
+-- Индексы таблицы `bulletin_board`
+--
+ALTER TABLE `bulletin_board`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `author_id` (`author_id`);
 
 --
 -- Индексы таблицы `comments`
@@ -136,6 +177,14 @@ ALTER TABLE `joke_categories`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индексы таблицы `likes`
+--
+ALTER TABLE `likes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `bulletin_id` (`bulletin_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Индексы таблицы `users`
 --
 ALTER TABLE `users`
@@ -144,6 +193,12 @@ ALTER TABLE `users`
 --
 -- AUTO_INCREMENT для сохранённых таблиц
 --
+
+--
+-- AUTO_INCREMENT для таблицы `bulletin_board`
+--
+ALTER TABLE `bulletin_board`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `comments`
@@ -164,6 +219,12 @@ ALTER TABLE `joke_categories`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
+-- AUTO_INCREMENT для таблицы `likes`
+--
+ALTER TABLE `likes`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT для таблицы `users`
 --
 ALTER TABLE `users`
@@ -174,10 +235,23 @@ ALTER TABLE `users`
 --
 
 --
+-- Ограничения внешнего ключа таблицы `bulletin_board`
+--
+ALTER TABLE `bulletin_board`
+  ADD CONSTRAINT `bulletin_board_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
 -- Ограничения внешнего ключа таблицы `jokes`
 --
 ALTER TABLE `jokes`
   ADD CONSTRAINT `jokes_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `joke_categories` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Ограничения внешнего ключа таблицы `likes`
+--
+ALTER TABLE `likes`
+  ADD CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`bulletin_id`) REFERENCES `bulletin_board` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  ADD CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
